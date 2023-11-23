@@ -1,12 +1,20 @@
-import sys
-from time import sleep
-
 import argparse
-import requests
 import logging
+import sys
+import os
+import rest_interface
+
+BASE_DIR = "./"
+
+def write_json_to_file(filename: str, json: dict) -> None:
+    os.path.join()
+
 
 def process_raw_data(s3_bucket: str, date: str):
-    pass
+    # TODO handle query params gracefully
+    stations_endpoint = rest_interface.RestInterface("stations?expanded=true")
+    stations = stations_endpoint.get_list()
+
 
 def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -21,5 +29,8 @@ def main():
     logging.info(f"Using args: {args}")
     ingest_data(args.path, args.date)
 
+
 if __name__ == "__main__":
-    main()
+    # TODO : fix this
+    process_raw_data("", "")
+    # main()
