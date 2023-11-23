@@ -1,9 +1,10 @@
 import argparse
-import logging
-import sys
-import os
-import rest_interface
 import json
+import logging
+import os
+import sys
+
+import rest_interface
 
 BASE_DIR = "."
 
@@ -14,21 +15,36 @@ def write_json_to_s3(s3_bucket, key: str):
 
 def write_json_to_file(subdir: str, filename: str, json_data: dict) -> None:
     nw_dir = os.path.join(BASE_DIR, subdir)
-    os.makedirs(os.path.dirname(nw_dir), exist_ok=True)
+    os.makedirs(nw_dir, exist_ok=True)
     full_filename = os.path.join(nw_dir, filename)
     with open(full_filename, "w+") as f:
         f.write(json.dumps(json_data, indent=2))
 
 
-def process_raw_data(s3_bucket: str, date: str):
-    # TODO handle query params gracefully
-    stations_endpoint = rest_interface.RestInterface("stations?expanded=true")
-    stations = stations_endpoint.get_list()
-    write_json_to_file("stations", "first", stations[0])
+def write_stations_to_files(stations: dict):
     for station in stations:
         station_id = station["properties"]["id"]
         filename = f"station_{station_id}.json"
         write_json_to_file("stations", filename, station)
+
+
+def handle_timeseries(iso_date: str):
+    """"
+    Require date in iso_date
+    """
+
+    timeseries = rest_interface.RestInterface(f"timeseries?timespan=PT24H/{iso_date}").get_list()
+    print(timeseries[0])
+    for timeserie in timeseries:
+        timeserie_id = timeserie['id']
+        filename = f"timeseries_{timeserie_id}.json"
+        write_json_to_file("timeseries", filename, timeserie)
+
+def process_raw_data(s3_bucket: str, date: str):
+    # TODO handle query params gracefully
+    stations_endpoint = rest_interface.RestInterface("stations?expanded=true")
+    stations = stations_endpoint.get_list()
+    write_stations_to_files(stations)
 
 
 def main():
@@ -47,5 +63,6 @@ def main():
 
 if __name__ == "__main__":
     # TODO : fix this
-    process_raw_data("", "")
+    # process_raw_data("", "")
+    handle_timeseries("2023-11-22")
     # main()
