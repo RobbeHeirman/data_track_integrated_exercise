@@ -35,15 +35,12 @@ def handle_timeseries(iso_date: str):
     timespan = f"PT24H/{iso_date}"
     timeseries = rest_interface.RestInterface(f"timeseries?timespan={timespan}").get_list()
     timeserie_data = rest_interface.TimeSeriesRestInterface("timeseries").get_timeseries_data_of_keys(timeseries, timespan)
-    print(timeserie_data)
 
     for timeserie in timeseries:
         timeserie_id = timeserie['id']
+        timeserie['values'] = timeserie_data[timeserie_id]["values"]
         filename = f"timeseries_{timeserie_id}.json"
-        write_json_to_file("timeseries", filename, timeserie)
-
-def get_time_of_series(series_id: int) -> dict:
-    pass
+        write_json_to_file(f"{iso_date}/timeseries", filename, timeserie)
 
 
 def process_raw_data(s3_bucket: str, date: str):
