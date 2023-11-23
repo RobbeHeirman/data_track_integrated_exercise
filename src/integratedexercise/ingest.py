@@ -13,8 +13,7 @@ BASE_DIR = "."
 
 def write_json_to_s3(s3_bucket: str, filename: str, json_data: dict):
     s3 = boto3.resource('s3')
-    b_name = 'data-track-integrated-exercise'
-    s3_object = s3.Object(b_name, filename)
+    s3_object = s3.Object(s3_bucket, filename)
     s3_object.put(Body=(bytes(json.dumps(json_data).encode('UTF-8'))))
 
 
@@ -26,7 +25,7 @@ def write_json_to_file(subdir: str, filename: str, json_data: dict) -> None:
         f.write(json.dumps(json_data, indent=2))
 
 
-def handle_stations(iso_date: str):
+def handle_stations(s3_bucket: str, iso_date: str):
     print("start fetch stations")
     stations_endpoint = rest_interface.RestInterface("stations?expanded=true")
     stations = stations_endpoint.get_list()
@@ -35,11 +34,11 @@ def handle_stations(iso_date: str):
     for station in stations:
         station_id = station["properties"]["id"]
         filename = f"robbe-data/{iso_date}/stations/station_{station_id}.json"
-        write_json_to_s3("", filename, station)
+        write_json_to_s3(s3_bucket, filename, station)
     print("end fetch stations")
 
 
-def handle_timeseries(iso_date: str):
+def handle_timeseries(s3_bucket: str, iso_date: str):
     """"
     Require date in iso_date
     """
@@ -57,14 +56,13 @@ def handle_timeseries(iso_date: str):
         timeserie_id = timeserie['id']
         timeserie['values'] = timeserie_data[timeserie_id]["values"]
         filename = f"robbe-data/{iso_date}/timeseries/timeseries_{timeserie_id}.json"
-        write_json_to_s3("", filename, timeserie)
+        write_json_to_s3(s3_bucket, filename, timeserie)
     print("end write time series")
 
 
 def process_raw_data(s3_bucket: str, date: str):
-    # TODO handle query params gracefully
-    handle_stations(date)
-    handle_timeseries(date)
+    handle_stations(s3_bucket, date)
+    handle_timeseries(s3_bucket, date)
 
 
 def main():
@@ -78,11 +76,8 @@ def main():
     )
     args = parser.parse_args()
     logging.info(f"Using args: {args}")
-    # ingest_data(args.path, args.date)
+    process_raw_data(args.path, args.date)
 
 
 if __name__ == "__main__":
-    # TODO : fix this
-    # process_raw_data("", "")
-    process_raw_data("", "2023-11-22")
-    # main()
+    main()
