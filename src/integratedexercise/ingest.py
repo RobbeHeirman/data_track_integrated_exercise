@@ -32,13 +32,19 @@ def handle_timeseries(iso_date: str):
     """"
     Require date in iso_date
     """
+    timespan = f"PT24H/{iso_date}"
+    timeseries = rest_interface.RestInterface(f"timeseries?timespan={timespan}").get_list()
+    timeserie_data = rest_interface.TimeSeriesRestInterface("timeseries").get_timeseries_data_of_keys(timeseries, timespan)
+    print(timeserie_data)
 
-    timeseries = rest_interface.RestInterface(f"timeseries?timespan=PT24H/{iso_date}").get_list()
-    print(timeseries[0])
     for timeserie in timeseries:
         timeserie_id = timeserie['id']
         filename = f"timeseries_{timeserie_id}.json"
         write_json_to_file("timeseries", filename, timeserie)
+
+def get_time_of_series(series_id: int) -> dict:
+    pass
+
 
 def process_raw_data(s3_bucket: str, date: str):
     # TODO handle query params gracefully
