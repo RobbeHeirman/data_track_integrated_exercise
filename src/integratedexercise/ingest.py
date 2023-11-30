@@ -54,7 +54,10 @@ def handle_timeseries(s3_bucket: str, iso_date: str):
     print("start write time series")
     for timeserie in timeseries:
         timeserie_id = timeserie['id']
-        timeserie['values'] = timeserie_data[timeserie_id]["values"]
+        if not (this_timeserie := timeserie_data.get(timeserie_id, None)):
+            continue
+
+        timeserie['values'] = this_timeserie["values"]
         filename = f"robbe-data/{iso_date}/timeseries/timeseries_{timeserie_id}.json"
         write_json_to_s3(s3_bucket, filename, timeserie)
     print("end write time series")
@@ -76,7 +79,8 @@ def main():
     )
     args = parser.parse_args()
     logging.info(f"Using args: {args}")
-    process_raw_data(args.path, args.date)
+    print(args.env)
+    process_raw_data(args.env, args.date)
 
 
 if __name__ == "__main__":
