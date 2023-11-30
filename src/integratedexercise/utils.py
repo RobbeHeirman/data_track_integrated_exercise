@@ -11,6 +11,7 @@ def log_function(func: Callable[[[Any], {str, Any}], Any]):
         start = time.time()
         result = func(*args, **kwargs)
         end = time.time()
-        logging.info(f"Finished Running {func.__name__} took {start - end} seconds")
+        logging.info(f"Finished Running {func.__name__} took {round(end - start)} seconds")
         return result
+
     return wrapper

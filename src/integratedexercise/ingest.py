@@ -12,14 +12,12 @@ from utils import log_function
 BASE_DIR = "."
 
 
-@log_function
 def write_json_to_s3(s3_bucket: str, filename: str, json_data: dict) -> None:
     s3 = boto3.resource('s3')
     s3_object = s3.Object(s3_bucket, filename)
     s3_object.put(Body=(bytes(json.dumps(json_data).encode('UTF-8'))))
 
 
-@log_function
 def write_json_to_file(subdir: str, filename: str, json_data: dict) -> None:
     nw_dir = os.path.join(BASE_DIR, subdir)
     os.makedirs(nw_dir, exist_ok=True)
