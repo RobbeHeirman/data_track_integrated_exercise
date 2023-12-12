@@ -4,6 +4,9 @@
     <option name="sdkName" value="Python 3.12 (data_track_integrated_exercise)" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="workspaceImportForciblyTurnedOn" value="true" />
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="Python 3.12 (data_track_integrated_exercise)" project-jdk-type="Python SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
